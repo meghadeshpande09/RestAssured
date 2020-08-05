@@ -1,0 +1,147 @@
+package com.qa.GoogleAPI;
+
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+
+import org.testng.annotations.Test;
+
+public class GoogelAPISearchForNearByResturtant 
+{
+	String Category;
+
+	@Test (priority=1,description=“Find restaurant matching with same category and type when wrong user id is entered”)
+         public void SerachResturtant()
+	{
+		RestAssured.baseURI="https://developers.zomato.com";
+
+		Response Resp=given().
+				param("query”,”category_id”). 
+                                 param(“query”,”category_name”).
+				param(“user-key”,”123”).
+				when().
+				get(“/api/v2.1/categories").
+				then().assertThat().statusCode(403).and().
+				contentType(ContentType.JSON).and().log().all().
+				body("status",equalTo("OK")).and().  
+				body("name",equalTo("Nightlife")). 
+				body(“id”,equalTo(“3”)).and(). 
+				header("server","scaffolding on HTTPServer2").and().
+				header("content-encoding","gzip").extract().
+				response();
+
+		String res=Resp.asString();
+		System.out.println("JSON Response after converting into String is"+res);
+
+		JsonPath js=new JsonPath(res);
+
+		int count=js.get("results.size()");
+		System.out.println("Total Place Name count is"+count);
+
+		for(int i=0;i<count;i++) {
+        String Name = js.getString("result["+i+"].name");
+       System.out.println(Name);
+       System.out.println(js.getInt("result["+i+"].id"));
+		}
+
+		Categoryid=js.get("results[2].category_id");
+		System.out.println(“category id is\t"+Categoryid);
+
+
+	}
+
+@Test (priority=2,description=“Find restaurant matching with same category and type when proper  user id is entered”)
+         public void SerachResturtant()
+	{
+		RestAssured.baseURI="https://developers.zomato.com";
+
+		Response Resp=given().
+				param("query”,”category_id”). 
+                                 param(“query”,”category_name”).
+				param(“user-key”,”1e6cb666973789ed1a612b0aad267cca”).
+				when().
+				get(“/api/v2.1/categories").
+				then().assertThat().statusCode(200).and().
+				contentType(ContentType.JSON).and().log().all().
+				body("status",equalTo("OK")).and().  
+				body("name",equalTo("Nightlife")). 
+				body(“id”,equalTo(“3”)).and(). 
+				header("server","scaffolding on HTTPServer2").and().
+				header("content-encoding","gzip").extract().
+				response();
+
+		String res=Resp.asString();
+		System.out.println("JSON Response after converting into String is"+res);
+
+		JsonPath js=new JsonPath(res);
+
+		int count=js.get("results.size()");
+		System.out.println("Total Place Name count is"+count);
+
+		for(int i=0;i<count;i++) {
+        String Name = js.getString("result["+i+"].name");
+       System.out.println(Name);
+       System.out.println(js.getInt("result["+i+"].id"));
+		}
+
+		Categoryid=js.get("results[2].category_id");
+		System.out.println(“category id is\t"+Categoryid);
+
+
+	}
+
+	@Test(priority=3,description=“Zomato id and other details using proper user id“)
+	public void ExtractPlaceId()
+	{
+		RestAssured.baseURI="https://developers.zomato.com";
+
+		Response Second=given().
+				param(“query”,”id,name,country_id,country_name”). 
+				param(“user-id”,”1e6cb666973789ed1a612b0aad267cca”).
+				param(“id”,Zomato-id).
+				when().
+				get("/api/v2.1/cities"). 
+				then().assertThat().  
+				statusCode(200).
+				body("result.name",equalTo(“Zomato id”)).and(). 
+				body("status",equalTo("OK")).and().  
+				extract().response(); 
+
+		String RespSecond=Second.asString();
+
+		System.out.println("Response for Second TestCase is"+RespSecond);
+
+
+	}
+
+@Test(priority=4, description=“Zomato id and other details using co-ordinates“)
+	public void ExtractPlaceId()
+	{
+		RestAssured.baseURI="https://developers.zomato.com";
+
+		Response Second=given().
+				param(“query”,”id,name,country_id,country_name”). 
+				param(“user-id”,”1e6cb666973789ed1a612b0aad267cca”).
+				param(“lat”,Latitude).
+                                 param(“lon”.Longitude).
+				when().
+				get("/api/v2.1/cities"). 
+				then().assertThat().  
+				statusCode(200).
+				body("result.name",equalTo(“Zomato id”)).and(). 
+				body("status",equalTo("OK")).and().  
+				extract().response(); 
+
+		String RespSecond=Second.asString();
+
+		System.out.println("Response for Second TestCase is"+RespSecond);
+
+
+	}
+
+
+}
